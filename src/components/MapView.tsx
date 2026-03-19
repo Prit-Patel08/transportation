@@ -1,20 +1,8 @@
-import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import React from 'react';
+import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useSimulationStore } from '../store/simulationStore';
-import L from 'leaflet';
-
-// Fix for default marker icons in Leaflet with React
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-let DefaultIcon = L.icon({
-    iconUrl: markerIcon,
-    shadowUrl: markerShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-L.Marker.prototype.options.icon = DefaultIcon;
+import { Activity } from 'lucide-react';
 
 const ChangeView = ({ center }: { center: [number, number] }) => {
   const map = useMap();
@@ -23,47 +11,46 @@ const ChangeView = ({ center }: { center: [number, number] }) => {
 };
 
 const MapView = () => {
-  const { selectedCity, results } = useSimulationStore();
+  const { selectedCity } = useSimulationStore();
 
   return (
-    <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-lg border border-slate-200">
+    <div className="relative w-full h-[450px] rounded-xl overflow-hidden border border-slate-800/50">
       <MapContainer 
         center={[selectedCity.lat, selectedCity.lng]} 
         zoom={12} 
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '100%', width: '100%', filter: 'invert(100%) hue-rotate(180deg) brightness(0.8) contrast(1.2)' }}
         zoomControl={false}
       >
         <ChangeView center={[selectedCity.lat, selectedCity.lng]} />
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
-        <Marker position={[selectedCity.lat, selectedCity.lng]}>
-          <Popup>
-            {selectedCity.name} Traffic Center
-          </Popup>
-        </Marker>
-
-        {/* Placeholder for Heatmap/Overlays */}
-        {results && (
-          <div className="absolute inset-0 pointer-events-none z-[1000] bg-blue-500/5 flex items-center justify-center">
-            <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-full text-xs font-bold text-blue-600 shadow-xl border border-blue-100">
-              TRAFFIC MODEL UPDATED
-            </div>
-          </div>
-        )}
       </MapContainer>
       
-      <div className="absolute bottom-4 left-4 z-[1000] bg-white/90 backdrop-blur p-3 rounded-lg shadow-md border border-slate-100 text-[10px] uppercase tracking-wider font-bold text-slate-500">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-3 h-3 rounded-full bg-red-500"></div> High Congestion
+      {/* Overlays */}
+      <div className="absolute top-6 left-6 z-[1000] bg-[#12161F]/90 backdrop-blur p-4 rounded-xl border border-slate-800/50 w-48">
+        <h4 className="text-[10px] font-black text-slate-400 tracking-widest uppercase mb-4">Live Congestion</h4>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-[#EF4444]"></div>
+            <span className="text-[10px] font-bold text-slate-300">High Density</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-[#F59E0B]"></div>
+            <span className="text-[10px] font-bold text-slate-300">Medium Flow</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-[#00D1FF]"></div>
+            <span className="text-[10px] font-bold text-slate-300">Optimal</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-3 h-3 rounded-full bg-yellow-500"></div> Moderate
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-green-500"></div> Low Congestion
-        </div>
+      </div>
+
+      <div className="absolute bottom-6 right-6 z-[1000]">
+        <button className="bg-[#1A1F2B]/90 backdrop-blur px-4 py-2 rounded-lg border border-slate-800/50 flex items-center gap-2 text-[10px] font-black text-slate-300 tracking-widest hover:bg-[#252B3B] transition-all">
+          <Activity className="w-3 h-3 text-[#00D1FF]" />
+          2035 TRAFFIC FORECAST MODE
+        </button>
       </div>
     </div>
   );

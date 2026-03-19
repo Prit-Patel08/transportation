@@ -9,7 +9,7 @@ import {
   Title,
   Tooltip,
   Legend,
-  ArcElement,
+  Filler,
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 import { useSimulationStore } from '../store/simulationStore';
@@ -20,7 +20,7 @@ ChartJS.register(
   BarElement,
   PointElement,
   LineElement,
-  ArcElement,
+  Filler,
   Title,
   Tooltip,
   Legend
@@ -29,75 +29,80 @@ ChartJS.register(
 const ChartsPanel = () => {
   const { results } = useSimulationStore();
 
-  if (!results) return null;
+  const defaultChartData = {
+    congestion: { before: 85, after: 62 },
+    emissions: { before: 120, after: 95 },
+    efficiency: [40, 45, 60, 55, 75, 88],
+  };
 
-  const { chartData } = results;
+  const chartData = results?.chartData || defaultChartData;
+
+  const barOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 10 } } },
+      x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } }
+    }
+  };
+
+  const lineOptions = {
+    ...barOptions,
+    elements: { point: { radius: 4, hoverRadius: 6, backgroundColor: '#00D1FF' } }
+  };
 
   const congestionData = {
-    labels: ['Before Policy', 'After Policy'],
-    datasets: [
-      {
-        label: 'Congestion Level (%)',
-        data: [chartData.congestion.before, chartData.congestion.after],
-        backgroundColor: ['rgba(239, 68, 68, 0.6)', 'rgba(59, 130, 246, 0.6)'],
-        borderRadius: 8,
-      },
-    ],
+    labels: ['BASELINE', 'OPTIMIZED'],
+    datasets: [{
+      data: [chartData.congestion.before, chartData.congestion.after],
+      backgroundColor: ['#334155', '#00D1FF'],
+      borderRadius: 4,
+      barThickness: 60,
+    }],
   };
 
   const emissionsData = {
-    labels: ['Before Policy', 'After Policy'],
-    datasets: [
-      {
-        label: 'CO2 Emissions (Tons/Day)',
-        data: [chartData.emissions.before, chartData.emissions.after],
-        backgroundColor: ['rgba(107, 114, 128, 0.6)', 'rgba(34, 197, 94, 0.6)'],
-        borderRadius: 8,
-      },
-    ],
+    labels: ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00'],
+    datasets: [{
+      data: [20, 35, 45, 65, 78, 75],
+      borderColor: '#F87171',
+      backgroundColor: 'rgba(248, 113, 113, 0.1)',
+      fill: true,
+      tension: 0.4,
+    }],
   };
 
   const efficiencyData = {
     labels: ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00'],
-    datasets: [
-      {
-        label: 'Mobility Efficiency Trend',
-        data: chartData.efficiency,
-        borderColor: 'rgb(99, 102, 241)',
-        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-        fill: true,
-        tension: 0.4,
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false,
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
+    datasets: [{
+      data: chartData.efficiency,
+      borderColor: '#00D1FF',
+      backgroundColor: 'rgba(0, 209, 255, 0.1)',
+      fill: true,
+      tension: 0.4,
+    }],
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <h4 className="text-sm font-bold text-slate-500 uppercase mb-6">Traffic Congestion</h4>
-        <Bar data={congestionData} options={options} />
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="nexus-card p-6 h-[300px]">
+        <h4 className="text-[10px] font-black text-slate-500 tracking-widest uppercase mb-6">Traffic Congestion: Before vs After</h4>
+        <div className="h-[200px]">
+          <Bar data={congestionData} options={barOptions} />
+        </div>
       </div>
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <h4 className="text-sm font-bold text-slate-500 uppercase mb-6">CO2 Emissions</h4>
-        <Bar data={emissionsData} options={options} />
+      <div className="nexus-card p-6 h-[300px]">
+        <h4 className="text-[10px] font-black text-slate-500 tracking-widest uppercase mb-6">CO2 Emissions Trend</h4>
+        <div className="h-[200px]">
+          <Line data={emissionsData} options={lineOptions} />
+        </div>
       </div>
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <h4 className="text-sm font-bold text-slate-500 uppercase mb-6">Efficiency Score Trend</h4>
-        <Line data={efficiencyData} options={options} />
+      <div className="nexus-card p-6 h-[300px]">
+        <h4 className="text-[10px] font-black text-slate-500 tracking-widest uppercase mb-6">Transport Efficiency Score</h4>
+        <div className="h-[200px]">
+          <Line data={efficiencyData} options={lineOptions} />
+        </div>
       </div>
     </div>
   );
