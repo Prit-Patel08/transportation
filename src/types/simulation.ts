@@ -1,9 +1,3 @@
-export interface City {
-  name: string;
-  lat: number;
-  lng: number;
-}
-
 export interface PolicyValues {
   private_car_usage: number;
   public_transport: number;
@@ -31,4 +25,13 @@ export interface SimulationResponse {
 
 export interface SimulationRequest extends PolicyValues {
   city: string;
+}
+
+export interface Scenario {
+  id: string;
+  name: string;
+  timestamp: string;
+  city: string;
+  policies: PolicyValues;
+  results: SimulationMetrics;
 }

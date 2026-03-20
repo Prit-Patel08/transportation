@@ -1,23 +1,25 @@
 import React from 'react';
-import { useSimulationStore } from '../store/simulationStore';
 import { Settings, Bell, User } from 'lucide-react';
+import { useCitySelection } from "@/hooks/useCitySelection";
+import { useSimulationStore } from "@/store/simulationStore";
 
-const TopBar = () => {
-  const { cities, selectedCity, setSelectedCity, statusMessage } = useSimulationStore();
+const Header = () => {
+  const { cities, city: selectedCity, setCity } = useCitySelection();
+  const { statusMessage } = useSimulationStore();
 
   return (
     <header className="h-20 border-b border-slate-800/50 flex items-center justify-between px-8 bg-[#0B0E14]/80 backdrop-blur-md sticky top-0 z-50">
       <nav className="flex items-center gap-8">
-        {cities.map((city) => (
+        {cities.map((c) => (
           <button
-            key={city.name}
-            onClick={() => setSelectedCity(city)}
+            key={c.name}
+            onClick={() => setCity(c.name)}
             className={`text-sm font-bold tracking-wide transition-all relative py-2 ${
-              selectedCity.name === city.name ? 'text-[#00D1FF]' : 'text-slate-500 hover:text-slate-300'
+              c.name === selectedCity.name ? 'text-[#00D1FF]' : 'text-slate-500 hover:text-slate-300'
             }`}
           >
-            {city.name}
-            {selectedCity.name === city.name && (
+            {c.name}
+            {c.name === selectedCity.name && (
               <div className="absolute -bottom-[26px] left-0 right-0 h-[2px] bg-[#00D1FF] shadow-[0_0_10px_rgba(0,209,255,0.5)]"></div>
             )}
           </button>
@@ -46,4 +48,4 @@ const TopBar = () => {
   );
 };
 
-export default TopBar;
+export default Header;

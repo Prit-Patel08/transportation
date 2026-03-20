@@ -1,48 +1,15 @@
-import React from 'react';
-import { LayoutDashboard, Car, Bus, Bike, Zap, Cpu, Settings, LifeBuoy } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { useSimulationStore } from '../store/simulationStore';
-import { simulateTraffic } from '../services/api';
-import { showSuccess, showError } from '../utils/toast';
+import { Car, Bus, Bike, Zap, Cpu, Settings, LifeBuoy } from 'lucide-react';
+import RunSimulationButton from '../controls/RunSimulationButton';
+import SaveScenarioButton from '../controls/SaveScenarioButton';
 
 const Sidebar = () => {
-  const { 
-    policies, 
-    selectedCity, 
-    setResults, 
-    setIsLoading, 
-    setStatusMessage,
-    isLoading 
-  } = useSimulationStore();
-
-  const handleRunSimulation = async () => {
-    setIsLoading(true);
-    setStatusMessage('Running Simulation...');
-    try {
-      const response = await simulateTraffic({
-        city: selectedCity.name,
-        ...policies
-      });
-      setStatusMessage('Updating traffic model...');
-      setTimeout(() => {
-        setResults(response);
-        setIsLoading(false);
-        setStatusMessage('Simulation Complete');
-        showSuccess('Simulation results updated successfully!');
-      }, 800);
-    } catch (error) {
-      setIsLoading(false);
-      setStatusMessage('Simulation Failed');
-      showError('Failed to run simulation.');
-    }
-  };
 
   const navItems = [
-    { icon: Car, label: 'CAR USAGE', active: true },
+    { icon: Car, label: 'PRIVATE VEHICLE USAGE', active: true },
     { icon: Bus, label: 'PUBLIC TRANSIT' },
     { icon: Bike, label: 'BIKE LANES' },
     { icon: Zap, label: 'EV ADOPTION' },
-    { icon: Cpu, label: 'SIGNAL OPT' },
+    { icon: Cpu, label: 'TRAFFIC SIGNAL OPTIMIZATION' },
   ];
 
   return (
@@ -71,14 +38,9 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <div className="mt-auto p-6 space-y-6">
-        <Button 
-          onClick={handleRunSimulation}
-          disabled={isLoading}
-          className="w-full bg-[#00D1FF] hover:bg-[#00B8E6] text-[#0B0E14] font-black py-6 rounded-lg shadow-[0_0_20px_rgba(0,209,255,0.2)] transition-all"
-        >
-          {isLoading ? 'PROCESSING...' : 'RUN SIMULATION'}
-        </Button>
+      <div className="mt-auto p-6 space-y-3">
+        <RunSimulationButton />
+        <SaveScenarioButton />
 
         <div className="space-y-2">
           <button className="w-full flex items-center gap-3 px-4 py-2 text-slate-500 hover:text-white transition-colors">
